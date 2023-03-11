@@ -1,5 +1,4 @@
 import sys
-import threading
 import time
 import threading
 from random import sample
@@ -9,17 +8,28 @@ from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
 def new_mem_window():
-
+    print("aaaaaa")
     mem_window = MemWindow(r'./1.jpg')
     mem_window.show()
 
 def sample_event(cat_time):
+    print("aa")
     time.sleep(int(cat_time))
     events_lists = ["mem"]
-    event  = sample(events_lists,1)
+    event = sample(events_lists,1)
+    # create_new_thread(cat_time)
     if event[0] == "mem":
+        print("xd")
         new_mem_window()
 
+
+# def create_new_thread(cat_time):
+#     print("dupa")
+#     t = threading.Thread(target = sample_event, args=(cat_time,))
+#     threads.append(t)
+#     t.start()
+#     print("aassss")
+#     t.join()
 
 class MemWindow(QMainWindow):
     def __init__(self,image_load):
@@ -85,8 +95,9 @@ class MainApp(QMainWindow):
         self.close()
         self.deleteLater()
         sample_event(int(self.cat_time.text()))
+        # create_new_thread(int(self.cat_time.text()))
 
-
+threads= []
 app = QApplication(sys.argv)
 window = MainApp()
 app.exec()
