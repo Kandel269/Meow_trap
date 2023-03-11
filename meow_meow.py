@@ -1,9 +1,8 @@
 import sys
 import time
-import threading
 from random import sample
 
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QSize, QObject, pyqtSignal, QThread
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
@@ -17,19 +16,23 @@ def sample_event(cat_time):
     time.sleep(int(cat_time))
     events_lists = ["mem"]
     event = sample(events_lists,1)
-    # create_new_thread(cat_time)
     if event[0] == "mem":
         print("xd")
         new_mem_window()
 
 
-# def create_new_thread(cat_time):
-#     print("dupa")
-#     t = threading.Thread(target = sample_event, args=(cat_time,))
-#     threads.append(t)
-#     t.start()
-#     print("aassss")
-#     t.join()
+
+class Worker(QObject):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        """
+        Funkcaj wykonywana przez watek
+        """
+        self.finished.emit()
 
 class MemWindow(QMainWindow):
     def __init__(self,image_load):
@@ -62,6 +65,14 @@ class MainApp(QMainWindow):
             self.button_start_clicked()
         else:
             self.show()
+
+        # wielowatkowosc
+        self.worker_thread = QThread()
+        self.worker = Worker()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker.finished.connect(self.on_worker_finished)
+
+
         self.main_window()
 
     def main_window(self):
@@ -94,8 +105,14 @@ class MainApp(QMainWindow):
 
         self.close()
         self.deleteLater()
-        sample_event(int(self.cat_time.text()))
-        # create_new_thread(int(self.cat_time.text()))
+
+        # Uruchamiamy wątek
+        self.worker_thread.start()
+        self.worker_thread.started.connect(self.worker.run)
+        # sample_event(int(self.cat_time.text()))
+
+    def on_worker_finished(self):
+        pass
 
 threads= []
 app = QApplication(sys.argv)
