@@ -11,27 +11,22 @@ def new_mem_window():
     mem_window = MemWindow(r'./1.jpg')
     mem_window.show()
 
-def sample_event(cat_time):
-    print("aa")
-    time.sleep(int(cat_time))
-    events_lists = ["mem"]
-    event = sample(events_lists,1)
-    if event[0] == "mem":
-        print("xd")
-        new_mem_window()
-
-
-
 class Worker(QObject):
     finished = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self,cat_time):
         super().__init__()
+        self.cat_time = cat_time
 
     def run(self):
-        """
-        Funkcaj wykonywana przez watek
-        """
+        print("aa")
+        time.sleep(int(self.cat_time))
+        events_lists = ["mem"]
+        event = sample(events_lists, 1)
+        if event[0] == "mem":
+            print("xd")
+            new_mem_window()
+        print("DDDDDDDd")
         self.finished.emit()
 
 class MemWindow(QMainWindow):
@@ -39,9 +34,9 @@ class MemWindow(QMainWindow):
         super().__init__()
         self.image_load = image_load
         self.setWindowTitle("MIAU_MIAU_MIAU")
-        self.show_mem()
         self.destroyed.connect(self.handle_destroyed)
         self.closeEvent = self.handle_destroyed
+        self.show_mem()
 
     def show_mem(self):
         self.widget = QLabel()
@@ -49,7 +44,6 @@ class MemWindow(QMainWindow):
         self.widget.setPixmap(self.pixmap)
         self.setCentralWidget(self.widget)
         self.resize(self.pixmap.width(), self.pixmap.height())
-
 
     def handle_destroyed(self, event=None):
         self.close()
@@ -65,13 +59,6 @@ class MainApp(QMainWindow):
             self.button_start_clicked()
         else:
             self.show()
-
-        # wielowatkowosc
-        self.worker_thread = QThread()
-        self.worker = Worker()
-        self.worker.moveToThread(self.worker_thread)
-        self.worker.finished.connect(self.on_worker_finished)
-
 
         self.main_window()
 
@@ -98,6 +85,13 @@ class MainApp(QMainWindow):
 
     def button_start_clicked(self):
         self.hide()
+
+        # wielowatkowosc
+        self.worker_thread = QThread()
+        self.worker = Worker(int(self.cat_time.text()))
+        self.worker.moveToThread(self.worker_thread)
+        self.worker.finished.connect(self.on_worker_finished)
+
         try:
             time.sleep(int(self.time_start.text()))
         except:
