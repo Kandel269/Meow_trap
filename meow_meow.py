@@ -7,6 +7,8 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
+events_lists = ["mem", "file","change_background"]
+
 def new_mem_window(cat_time) -> None:
     mem_list = []
     files = os.listdir()
@@ -23,24 +25,38 @@ def check_onderive() -> str:
     onedrive_dir = os.path.join(home_dir, 'OneDrive')
 
     if os.path.isdir(onedrive_dir):
-        return onedrive_dir
+        desktop_path = os.path.join(onedrive_dir, 'Pulpit')
     else:
-        return home_dir
+        desktop_path = os.path.join(home_dir, 'Pulpit')
+    return desktop_path
 
 def new_file(cat_time):
     desktop_path = check_onderive()
-    full_path = os.path.join(desktop_path, "Meow_meow_meow.txt")
-    with open(full_path, mode = "w"):
-        pass
+
+    for _ in range(3):
+        counter = 1
+        while True:
+            file = f"Meow_meow_meow-{str(counter)}.txt"
+            full_path = os.path.join(desktop_path, file)
+            if file in os.listdir(desktop_path):
+                counter += 1
+                continue
+            try:
+                with open(full_path, mode = "w"):
+                    break
+            except:
+                break
 
 def sample_event(cat_time) -> None:
     time.sleep(int(cat_time))
-    events_lists = ["mem","file"]
     event  = sample(events_lists,1)
     if event[0] == "mem":
         new_mem_window(cat_time)
-    if event[0] == "file":
+    elif event[0] == "file":
+        events_lists.remove("file")
         new_file(cat_time)
+    elif event[0] == "change_background":
+        pass
 
 class MemWindow(QMainWindow):
     """
