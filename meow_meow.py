@@ -7,7 +7,7 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
-def new_mem_window(cat_time):
+def new_mem_window(cat_time) -> None:
     mem_list = []
     files = os.listdir()
     for file in files:
@@ -18,15 +18,34 @@ def new_mem_window(cat_time):
     w = MemWindow(f"./{str(mem[0])}",cat_time)
     w.show()
 
-def sample_event(cat_time):
+def check_onderive() -> str:
+    home_dir = os.path.expanduser('~')
+    onedrive_dir = os.path.join(home_dir, 'OneDrive')
+
+    if os.path.isdir(onedrive_dir):
+        return onedrive_dir
+    else:
+        return home_dir
+
+def new_file(cat_time):
+    desktop_path = check_onderive()
+    full_path = os.path.join(desktop_path, "Meow_meow_meow.txt")
+    with open(full_path, mode = "w"):
+        pass
+
+def sample_event(cat_time) -> None:
     time.sleep(int(cat_time))
-    events_lists = ["mem"]
+    events_lists = ["mem","file"]
     event  = sample(events_lists,1)
     if event[0] == "mem":
         new_mem_window(cat_time)
-
+    if event[0] == "file":
+        new_file(cat_time)
 
 class MemWindow(QMainWindow):
+    """
+    Create window with mem
+    """
     def __init__(self,image_load,cat_time):
         super().__init__()
         self.image_load = image_load
@@ -52,6 +71,9 @@ class MemWindow(QMainWindow):
 
 
 class MainApp(QMainWindow):
+    """
+    Create Main window
+    """
     def __init__(self,hide_or_no = 1):
         super().__init__()
         self.setFixedSize(QSize(500, 400))
