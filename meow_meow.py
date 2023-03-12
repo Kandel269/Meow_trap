@@ -1,42 +1,40 @@
+import os
 import sys
 import time
 from random import sample
 
-from PyQt6.QtCore import QSize, QObject, pyqtSignal, QThread
+from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
-def new_mem_window():
-    print("aaaaaa")
-    mem_window = MemWindow(r'./1.jpg')
-    mem_window.show()
+def new_mem_window(cat_time):
+    mem_list = []
+    files = os.listdir()
+    for file in files:
+        if file.endswith('.jpg'):
+            mem_list.append(file)
 
-class Worker(QObject):
-    finished = pyqtSignal()
+    mem = sample(mem_list,1)
+    w = MemWindow(f"./{str(mem[0])}",cat_time)
+    w.show()
 
-    def __init__(self,cat_time):
-        super().__init__()
-        self.cat_time = cat_time
+def sample_event(cat_time):
+    time.sleep(int(cat_time))
+    events_lists = ["mem"]
+    event  = sample(events_lists,1)
+    if event[0] == "mem":
+        new_mem_window(cat_time)
 
-    def run(self):
-        print("aa")
-        time.sleep(int(self.cat_time))
-        events_lists = ["mem"]
-        event = sample(events_lists, 1)
-        if event[0] == "mem":
-            print("xd")
-            new_mem_window()
-        print("DDDDDDDd")
-        self.finished.emit()
 
 class MemWindow(QMainWindow):
-    def __init__(self,image_load):
+    def __init__(self,image_load,cat_time):
         super().__init__()
         self.image_load = image_load
+        self.cat_time = cat_time
         self.setWindowTitle("MIAU_MIAU_MIAU")
+        self.show_mem()
         self.destroyed.connect(self.handle_destroyed)
         self.closeEvent = self.handle_destroyed
-        self.show_mem()
 
     def show_mem(self):
         self.widget = QLabel()
@@ -45,9 +43,12 @@ class MemWindow(QMainWindow):
         self.setCentralWidget(self.widget)
         self.resize(self.pixmap.width(), self.pixmap.height())
 
+
     def handle_destroyed(self, event=None):
         self.close()
         self.deleteLater()
+        sample_event(self.cat_time)
+
 
 
 class MainApp(QMainWindow):
@@ -59,7 +60,6 @@ class MainApp(QMainWindow):
             self.button_start_clicked()
         else:
             self.show()
-
         self.main_window()
 
     def main_window(self):
@@ -84,14 +84,7 @@ class MainApp(QMainWindow):
         self.setCentralWidget(widget)
 
     def button_start_clicked(self):
-        self.hide()
-
-        # wielowatkowosc
-        self.worker_thread = QThread()
-        self.worker = Worker(int(self.cat_time.text()))
-        self.worker.moveToThread(self.worker_thread)
-        self.worker.finished.connect(self.on_worker_finished)
-
+        # self.hide()
         try:
             time.sleep(int(self.time_start.text()))
         except:
@@ -99,16 +92,10 @@ class MainApp(QMainWindow):
 
         self.close()
         self.deleteLater()
+        sample_event(int(self.cat_time.text()))
 
-        # Uruchamiamy wątek
-        self.worker_thread.start()
-        self.worker_thread.started.connect(self.worker.run)
-        # sample_event(int(self.cat_time.text()))
 
-    def on_worker_finished(self):
-        pass
 
-threads= []
 app = QApplication(sys.argv)
 window = MainApp()
 app.exec()
