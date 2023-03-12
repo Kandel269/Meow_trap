@@ -2,12 +2,35 @@ import os
 import sys
 import time
 from random import sample
+import ctypes
+from PIL import Image
 
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
 
-events_lists = ["mem", "file","change_background"]
+events_lists = ["mem", "file","change_background","lockscreen"]
+
+def change_background(cat_time, SPI_SETDESKWALLPAPER) -> None:
+    new_wallpaper_path = '.\wall.jpeg'
+
+    user32 = ctypes.windll.user32
+    width = user32.GetSystemMetrics(0)
+    height = user32.GetSystemMetrics(1)
+
+    image = Image.open('.\Kot_wall.jpg')
+    image = image.resize((width, height), Image.LANCZOS)
+
+    image.save(new_wallpaper_path, 'JPEG')
+
+    try:
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, new_wallpaper_path, 0)
+    except:
+        pass
+
+    os.remove(new_wallpaper_path)
+
+    sample_event(cat_time)
 
 def new_mem_window(cat_time) -> None:
     mem_list = []
@@ -30,7 +53,7 @@ def check_onderive() -> str:
         desktop_path = os.path.join(home_dir, 'Pulpit')
     return desktop_path
 
-def new_file(cat_time):
+def new_file(cat_time) -> None:
     desktop_path = check_onderive()
 
     for _ in range(3):
@@ -47,6 +70,8 @@ def new_file(cat_time):
             except:
                 break
 
+    sample_event(cat_time)
+
 def sample_event(cat_time) -> None:
     time.sleep(int(cat_time))
     event  = sample(events_lists,1)
@@ -56,7 +81,11 @@ def sample_event(cat_time) -> None:
         events_lists.remove("file")
         new_file(cat_time)
     elif event[0] == "change_background":
-        pass
+        events_lists.remove("change_background")
+        change_background(cat_time, 20)
+    elif event[0] == "lockscreen":
+        events_lists.remove("lockscreen")
+        change_background(cat_time, 474)
 
 class MemWindow(QMainWindow):
     """
