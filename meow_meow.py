@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVB
 events_lists = ["mem", "file","change_background","lockscreen"]
 
 def change_background(cat_time, SPI_SETDESKWALLPAPER) -> None:
-    new_wallpaper_path = '.\wall.jpeg'
+    new_wallpaper_path = '.\wall.jpg'
 
     user32 = ctypes.windll.user32
     width = user32.GetSystemMetrics(0)
