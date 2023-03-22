@@ -8,15 +8,14 @@ from PIL import Image
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QVBoxLayout, QLineEdit, QLabel
+import pygame
 
-# events_lists = ["mem","file","change_background"]
-events_lists = ["file"]
+events_lists = ["mem","file","change_background","sound"]
 
 def change_background(cat_time, SPI_SETDESKWALLPAPER = 20) -> None:
     file_path = r"C:\Users\Domin\PycharmProjects\Meow_trap\Kot_wall.jpg"
     if os.name == 'nt':
         ctypes.windll.user32.SystemParametersInfoW(SPI_SETDESKWALLPAPER, 0, file_path, 0)
-        print("dupa")
 
     sample_event(cat_time)
 
@@ -31,15 +30,15 @@ def new_mem_window(cat_time) -> None:
     w = MemWindow(f"./{str(mem[0])}",cat_time)
     w.show()
 
-def check_onderive() -> str:
-    home_dir = os.path.expanduser('~')
-    onedrive_dir = os.path.join(home_dir, 'OneDrive')
+def meow_sound(cat_time) -> None:
+    pygame.init()
+    pygame.mixer.music.load("cat_meow.wav")
+    pygame.mixer.music.play()
 
-    if os.path.isdir(onedrive_dir):
-        desktop_path = os.path.join(onedrive_dir, 'Desktop')
-    else:
-        desktop_path = os.path.join(home_dir, 'Desktop')
-    return desktop_path
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+
+    sample_event(cat_time)
 
 def new_file(cat_time) -> None:
     home_dir = os.path.expanduser('~')
@@ -76,6 +75,8 @@ def sample_event(cat_time) -> None:
     elif event[0] == "change_background":
         events_lists.remove("change_background")
         change_background(cat_time, 20)
+    elif event[0] == "sound":
+        meow_sound(cat_time)
 
 
 class MemWindow(QMainWindow):
