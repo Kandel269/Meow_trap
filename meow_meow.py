@@ -3,7 +3,7 @@ import sys
 import time
 from random import sample
 import ctypes
-from PIL import Image
+
 
 from PyQt6.QtCore import QSize
 from PyQt6.QtGui import QPixmap
