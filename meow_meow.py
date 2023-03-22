@@ -36,31 +36,33 @@ def check_onderive() -> str:
     onedrive_dir = os.path.join(home_dir, 'OneDrive')
 
     if os.path.isdir(onedrive_dir):
-        desktop_path = os.path.join(onedrive_dir, 'Pulpit')
+        desktop_path = os.path.join(onedrive_dir, 'Desktop')
     else:
-        desktop_path = os.path.join(home_dir, 'Pulpit')
+        desktop_path = os.path.join(home_dir, 'Desktop')
     return desktop_path
 
 def new_file(cat_time) -> None:
-    desktop_path = check_onderive()
-    print(desktop_path)
-    print("bb")
-    for _ in range(3):
-        counter = 1
-        while True:
-            file = f"Meow_meow_meow-{str(counter)}.txt"
-            full_path = os.path.join(desktop_path, file)
-            if file in os.listdir(desktop_path):
-                counter += 1
-                continue
-            print(full_path)
-            try:
-                with open(full_path, mode = "w"):
-                    break
-            except:
-                break
-
-    print("aaa")
+    home_dir = os.path.expanduser('~')
+    desktop_path_list = [r'Desktop',r'Pulpit',r'OneDrive\Desktop',r'OneDrive\Pulpit']
+    for path in desktop_path_list:
+        desktop_path = os.path.join(home_dir, path)
+        try:
+            for _ in range(3):
+                counter = 1
+                while True:
+                    file = fr"Meow_meow_meow-{str(counter)}.txt"
+                    full_path = os.path.join(desktop_path, file)
+                    if file in os.listdir(desktop_path):
+                        counter += 1
+                        continue
+                    try:
+                        with open(full_path, mode = "w"):
+                            break
+                    except:
+                        break
+            break
+        except:
+            continue
     sample_event(cat_time)
 
 def sample_event(cat_time) -> None:
